@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  containerpipelinetest:
+    image: cloudacademyacr.azurecr.io/containerpipelinetest:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: containerpipelinetest-1
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5024
+      - Logging__LogLevel__Microsoft=Debug
+      - Logging__LogLevel__Default=Debug
+    ports: 
+      - 5024:5024
+      - 2224:2222
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - clac_common_network
+networks:
+  clac_common_network:
+    name: clac_common_network
+    external: true
+volumes:
+  kestrel_certificate: {}    

@@ -1,0 +1,136 @@
+# PIPELINE TEMPLATE FOR CONTAINERIZED APPLICATIONS
+# Replace the values under the variables and parameters section below to suit your application.
+# 
+# This template uses Servicemanifest, and "replacetokens@3" to replace  with prefix $( and suffix ) with values from Azure Keyvault
+# 
+
+trigger:
+  batch: "true"
+  branches:
+    include:
+      - master
+      - azure-main
+
+resources:
+  repositories:
+  - repository: Servicemanifest
+    type: git
+    name: Platform/Servicemanifest
+    ref: master
+
+  - repository: Pipelines
+    type: git
+    name: Platform/Pipelines
+    ref: refs/heads/master
+
+#######################################################  
+###### Non-env-specific Variables & Parameters ########
+variables:
+  - name: containerRegistry
+    value: cloudacademyacr
+  - name: containerImageName
+    value: containerpipelinetest
+
+parameters:
+  - name: buildContext
+    default: "**" 
+  - name: vmImageName
+    default: ubuntu-22.04
+
+  - name: dev
+    type: object
+    default:
+      webAppName: clac-d-app-containerpipelinetest
+      environment: dev
+      tjenestemanifestFilename: containerpipelinetest.dev.json
+      resourceGroup: clac-d-rg-containerpipelinetest
+      azureSubscription: clac-d-sp-deploy-containerpipelinetest
+      keyVaultName: clac-d-containerpipetest # Name is shortened because of limitations of Azure Key Vault of 24 characters
+      deploymentEnvironment: containerpipelinetest-dev
+
+  # - name: test
+  #   type: object
+  #   default:
+  #     webAppName: clac-t-app-containerpipelinetest
+  #     environment: test
+  #     tjenestemanifestFilename: containerpipelinetest.test.json
+  #     resourceGroup: clac-t-rg-containerpipelinetest
+  #     azureSubscription: clac-t-sp-containerpipelinetest
+  #     keyVaultName: clac-t-contpipelinetest
+  #     deploymentEnvironment: containerpipelinetest-test
+
+  # - name: prod
+  #   type: object
+  #   default:
+  #     webAppName: clac-p-app-containerpipelinetest
+  #     environment: prod
+  #     tjenestemanifestFilename: containerpipelinetest.prod.json
+  #     resourceGroup: clac-p-rg-containerpipelinetest
+  #     azureSubscription: clac-p-sp-containerpipelinetest
+  #     keyVaultName: clac-p-contpipelinetest
+  #     deploymentEnvironment: containerpipelinetest-prod
+
+##             END OF PARAMETERS SECTION              ##
+##         NOTHING BELOW NEEDS TO BE CHANGED          ##
+########################################################
+      
+########################################################
+#################   Build    ###########################
+
+stages:
+  - stage: Bygg
+    jobs:
+      - template: container/pipelines/templates/containerimage-build.yml@Pipelines       
+        parameters:
+          containerRegistry: ${{ variables.containerRegistry }}
+          containerImageName: ${{ variables.containerImageName }}
+          vmImageName: ${{ parameters.vmImageName }}
+          buildContext: ${{ parameters.buildContext }}
+
+########################################################
+##############     Deploy: Dev     #####################
+
+  - template: container/pipelines/deploy.generic.yml@Pipelines      
+    parameters:
+      webAppName: ${{ parameters.dev.webAppName }}
+      environment: ${{ parameters.dev.environment }}
+      tjenestemanifestFilename: ${{ parameters.dev.tjenestemanifestFilename }}
+      resourceGroup: ${{ parameters.dev.resourceGroup }}
+      azureSubscription: ${{ parameters.dev.azureSubscription }}
+      keyVaultName: ${{ parameters.dev.keyVaultName }}  
+      deploymentEnvironment: ${{ parameters.dev.deploymentEnvironment }}  
+      containerImageName: ${{ variables.containerImageName }}
+      containerRegistry: ${{ variables.containerRegistry }}
+      dependsOn: Bygg
+
+# ########################################################
+# ##############     Deploy: Test    #####################
+
+#   - template: container/pipelines/deploy.generic.yml@Pipelines      
+#     parameters:
+#       webAppName: ${{ parameters.test.webAppName }}
+#       environment: ${{ parameters.test.environment }}
+#       tjenestemanifestFilename: ${{ parameters.test.tjenestemanifestFilename }}
+#       resourceGroup: ${{ parameters.test.resourceGroup }}
+#       azureSubscription: ${{ parameters.test.azureSubscription }}
+#       keyVaultName: ${{ parameters.test.keyVaultName }}  
+#       deploymentEnvironment: ${{ parameters.test.deploymentEnvironment }}  
+#       containerImageName: ${{ variables.containerImageName }}
+#       containerRegistry: ${{ variables.containerRegistry }}
+#       dependsOn: Deploy${{ replace( parameters.dev.webAppName,'-','_' )}}  
+
+# ########################################################
+# ##############     Deploy: Prod    #####################
+
+#   - template: container/pipelines/deploy.generic.yml@Pipelines      
+#     parameters:
+#       webAppName: ${{ parameters.prod.webAppName }}
+#       environment: ${{ parameters.prod.environment }}
+#       tjenestemanifestFilename: ${{ parameters.prod.tjenestemanifestFilename }}
+#       resourceGroup: ${{ parameters.prod.resourceGroup }}
+#       azureSubscription: ${{ parameters.prod.azureSubscription }}
+#       keyVaultName: ${{ parameters.prod.keyVaultName }}  
+#       deploymentEnvironment: ${{ parameters.prod.deploymentEnvironment }}  
+#       containerImageName: ${{ variables.containerImageName }}
+#       containerRegistry: ${{ variables.containerRegistry }}
+#       dependsOn: Deploy${{ replace( parameters.test.webAppName,'-','_' )}}  
