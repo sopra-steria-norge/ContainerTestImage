@@ -35,7 +35,7 @@ COPY src/ .
 # WORKDIR /src
 # COPY ["src/ContainerPipelineTest/ContainerPipelineTest.csproj", "ContainerPipelineTest/"]
 # RUN dotnet restore "ContainerPipelineTest/ContainerPipelineTest.csproj"
-COPY src/ .
+# COPY src/ .
 # WORKDIR "/src/ContainerPipelineTest"
 # RUN dotnet build "ContainerPipelineTest.csproj" -c Release -o /app/build
 
