@@ -31,7 +31,6 @@ EXPOSE 443
 
 COPY src/ .
 
-
 # FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 # WORKDIR /src
 # COPY ["src/ContainerPipelineTest/ContainerPipelineTest.csproj", "ContainerPipelineTest/"]
