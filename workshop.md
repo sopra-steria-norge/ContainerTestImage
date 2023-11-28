@@ -1,4 +1,4 @@
-# Workshop: Implementering av MSAL for i Containeriserte .NET Applikasjoner
+# Workshop: Implementering av MSAL i containeriserte .NET Applikasjoner
 
 Et av stegene innenfor både applikasjonsmodernisering og containerisering er å endre tjenesten til å bruke Microsoft Authentication Library (MSAL). Dette skiftet er avgjørende for applikasjoner som migreres fra tradisjonelle IIS-baserte tjenester til en mer moderne, containerisert arkitektur i Azure.
 
@@ -32,4 +32,8 @@ MSAL brukes til å autentisere brukere i webklienten, slik at den kan kommuniser
 
 4. Finn kun på en fanzy app "Name", og klikk på "Register"
 
-Tada! Du har laget en (din første?) App Registration
+**Tada! Du har laget en (din første?) App Registration**
+
+
+
+![](assets/2023-11-28-21-01-21-image.png)
