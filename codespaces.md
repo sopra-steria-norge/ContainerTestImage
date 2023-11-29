@@ -1,6 +1,6 @@
 # Pre-workshop: Test oppsett av Codespaces
 
-Et av stegene innenfor både applikasjonsmodernisering og containerisering er å endre tjenesten til å bruke Microsoft Authentication Library (MSAL). Dette skiftet er avgjørende for applikasjoner som migreres fra tradisjonelle IIS-baserte tjenester til en mer moderne, containerisert arkitektur i Azure.
+I workshopen vil vi ta i bruk Codespaces for å enkelt kjøre opp aplikasjonen. Det er derfor praktisk om du har VS Code på PC'en din.
 
 ## Hovedpunkter:
 
