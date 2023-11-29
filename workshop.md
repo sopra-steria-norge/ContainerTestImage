@@ -14,7 +14,7 @@ Et av stegene innenfor både applikasjonsmodernisering og containerisering er å
 
 # Oppsett av MSAL
 
-## Hva er MSAL?
+## Hva er [MSAL](https://learn.microsoft.com/en-us/entra/identity-platform/msal-overview)?
 
 TL;DR: MSAL (Microsoft Authentication Library) er et bibliotek utviklet av Microsoft for å hjelpe applikasjoner med å autentisere brukere og få tilgang til Microsofts skytjenester og API-er som Microsoft 365, Azure, og mer, ved bruk av standardiserte protokoller som OAuth 2.0 og OpenID Connect. Det forenkler sikkerhetstokenhåndtering og støtter flere programmeringsspråk og plattformer.
 
@@ -34,6 +34,32 @@ MSAL brukes til å autentisere brukere i webklienten, slik at den kan kommuniser
 
 **Tada! Du har laget en (din første?) App Registration**
 
+![](assets/2023-11-29-09-24-42-image.png)
 
+## Registrer din App Registration i ContainerTestImage
 
-![](assets/2023-11-28-21-01-21-image.png)
+1. Finn filen "**appsettings.json**"
+
+```
+{
+   "AzureAd": {
+      "Instance": "https://login.microsoftonline.com/",
+      "ClientId": "api://clac-d-entra-containerpipelinetest",
+      "Audience": "api://clac-d-entra-containerpipelinetest",
+      "TenantId": "8b87af7d-8647-4dc7-8df4-5f69a2011bb5",
+      "ClientSecret": ""
+   }
+}
+```
+
+2. Bytt verdiene til **ClientId** og **Audience** med navnet på din App Registration
+
+3. Start tjenesten ved å trykke på F5
+
+4. Gå til URL: [http://localhost:5202/swagger/index.html](http://localhost:5202/swagger/index.html)
+
+Dette starter tjenesten i kjøremiljøet til Codespaces og lager en [Remote Tunnel](https://code.visualstudio.com/docs/remote/tunnels) som fungerer som en port forwarding mot din laptop sin localhost, slik at tjenesten blir tilgjengelig tilsynelatende på din lokale laptop på [http://localhost:5202/swagger/index.html](http://localhost:5202/swagger/index.html)
+
+Da dukker dette opp i VSCode som viser hvilke porter som forwardet til din laptop:
+
+![](assets/2023-11-29-10-17-01-image.png)
