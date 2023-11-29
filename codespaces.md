@@ -1,6 +1,6 @@
 # Pre-workshop: Test oppsett av Codespaces
 
-I workshopen vil vi ta i bruk Codespaces for å enkelt kjøre opp aplikasjonen. Det er derfor praktisk om du har VS Code på PC'en din.
+I workshopen vil vi ta i bruk Codespaces for å enkelt kjøre opp applikasjonen. Det er derfor praktisk om du har VS Code på PC'en din.
 
 ## Hovedpunkter:
 
