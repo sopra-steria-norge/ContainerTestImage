@@ -63,3 +63,26 @@ Dette starter tjenesten i kjøremiljøet til Codespaces og lager en [Remote Tunn
 Da dukker dette opp i VSCode som viser hvilke porter som forwardet til din laptop:
 
 ![](assets/2023-11-29-10-17-01-image.png)
+
+
+
+## Logg inn med MSAL i Swagger
+
+Nå ser du omtrent dette:
+
+
+![](assets/2023-11-29-10-22-33-image.png)
+
+
+
+1. Klikk på "**Authorize**" og logg inn med Sopra Steria brukeren
+
+
+
+Access denied !
+
+Vi må legge til riktig redirect i App Registration.
+
+
+
+2. Legg til Redirect
