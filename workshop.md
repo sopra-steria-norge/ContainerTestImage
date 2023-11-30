@@ -22,7 +22,7 @@ MSAL brukes til å autentisere brukere i webklienten, slik at den kan kommuniser
 
 ## Opprett en App registration i Microsoft Entra ID (tidligere Azure AD)
 
-1. Gå til https://portal.azure.com/ og logg inn med Sopra Steria brukerenn
+1. Gå til https://portal.azure.com/ og logg inn med Sopra Steria brukeren din
 
 2. Gå til [https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps)
    
