@@ -36,7 +36,7 @@ MSAL brukes til å autentisere brukere i webklienten, slik at den kan kommuniser
 
 ![](assets/2023-11-29-09-24-42-image.png)
 
-## Registrer din App Registration i ContainerTestImage
+## Registrer din App Registration i ContainerPipelineTest
 
 1. Finn filen "**appsettings.json**"
 
@@ -85,6 +85,9 @@ Vi må legge til riktig redirect i App Registration.
 
 # Legg til Redirect URIs
 2. Legg til Redirect URIs slik at applikasjonen vår kan autentisere ved bruk av OAuth provideren (Microsoft Entra ID), motta access token, verifisere dine credentials og redirecte tilbake til applikasjonen.
+
+Legg inn følgende redirect URI: http://localhost:5202/swagger/oauth2-redirect.html 
+
 ![](assets/redirect_URIs_AppReg.png)
 For utvidet forståelse, gå til: [Microsoft Entra ID authentication flow](https://learn.microsoft.com/en-us/entra/architecture/auth-oauth2)
 

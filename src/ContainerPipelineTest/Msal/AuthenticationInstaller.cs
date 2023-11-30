@@ -21,7 +21,7 @@ namespace ContainerPipelineTest.Msal
             serviceCollection.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(configuration, "AzureAd")                
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                // .AddDownstreamWebApi(WebApiNames.NavData, configuration.GetSection(WebApiNames.NavData))
+                // .AddDownstreamWebApi(WebApiNames.SomeService, configuration.GetSection(WebApiNames.SomeService))
                 .AddInMemoryTokenCaches();
         }
 
