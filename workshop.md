@@ -85,4 +85,8 @@ Vi må legge til riktig redirect i App Registration.
 
 
 
-2. Legg til Redirect
+2. Legg til Redirect URIs slik at applikasjonen vår kan autentisere ved bruk av OAuth provideren (Microsoft Entra ID), motta access token, verifisere dine credentials og redirecte tilbake til applikasjonen.
+![](assets/redirect_URIs_AppReg.png)
+For utvidet forståelse, gå til: [Microsoft Entra ID authentication flow](https://learn.microsoft.com/en-us/entra/architecture/auth-oauth2)
+
+3. 
