@@ -14,11 +14,11 @@ I workshopen vil vi ta i bruk Codespaces for å enkelt kjøre opp applikasjonen.
 
 ![Codespaces preview image](assets/preview_codespaces.png)
 
-2. Åpne i VS Code: Følg stegene i punkt 1. Trykk deretter på knappen nederst i venstre hjørne, og velg "Open in VS Code Desktop" (se bilde)
+2. Åpne i VS Code: Følg stegene i punkt 1. Trykk deretter på knappen nederst i venstre hjørne, og velg "Open in VS Code Desktop" (se bilde).
 
 ![Åpne Codespace i VS Code Desktop](assets/open_codespace_VSCode.png)
 
-3. Forsett å følge quickstart-guiden fra punkt 1
+3. Fortsett med å følge stegene i quickstart-guiden fra punkt 1.
 
 ## For å utforske mer:
 
