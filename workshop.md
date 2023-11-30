@@ -30,7 +30,7 @@ MSAL brukes til å autentisere brukere i webklienten, slik at den kan kommuniser
 
 3. Klikk på "New registration"
 
-4. Finn kun på en fanzy app "Name", og klikk på "Register"
+4. Finn på et fanzy app "Name", og klikk på "Register"
 
 **Tada! Du har laget en (din første?) App Registration**
 
