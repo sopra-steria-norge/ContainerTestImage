@@ -80,16 +80,16 @@ Nå ser du omtrent dette:
 
 
 Access denied !
-
 Vi må legge til riktig redirect i App Registration.
 
 
-
+# Legg til Redirect URIs
 2. Legg til Redirect URIs slik at applikasjonen vår kan autentisere ved bruk av OAuth provideren (Microsoft Entra ID), motta access token, verifisere dine credentials og redirecte tilbake til applikasjonen.
 ![](assets/redirect_URIs_AppReg.png)
 For utvidet forståelse, gå til: [Microsoft Entra ID authentication flow](https://learn.microsoft.com/en-us/entra/architecture/auth-oauth2)
 
 Får du fortsatt ikke autentisert??
 
+# Spesifiser scopes for applikasjonen
 3. Legg til scope for API'et under "Expose an API" i Application Registration. Når en applikasjon spør om tilgang til en annen applikasjon, så må den spesifisere hvilke scopes den skal ha tilgang til. 
 ![](assets/Swagger.Auth_scope_appreg.png)
