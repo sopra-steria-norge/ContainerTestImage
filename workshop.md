@@ -82,6 +82,10 @@ Nå ser du omtrent dette:
 Access denied !
 Vi må legge til riktig redirect i App Registration.
 
+# Legg til "Application ID URI"
+- Legg til "Application ID URI" med navnet på din App Registration som er prefix med "api://"
+Dette er for at App Registration skal være enklere å automatisere med IAC senere.
+
 
 # Legg til Redirect URIs
 2. Legg til Redirect URIs slik at applikasjonen vår kan autentisere ved bruk av OAuth provideren (Microsoft Entra ID), motta access token, verifisere dine credentials og redirecte tilbake til applikasjonen.
