@@ -15,7 +15,162 @@
     // (Optional) Increase suggestion visibility (tweak as needed)
     "github.copilot.advanced": {
         "inlineSuggestCount": 3,
-        "inlineSuggestDelay": 100
+        "inlineSuggestDelay": 100,
+        "autoAccept": true,
+        "showEditorPrompts": false        
     },
-    "chat.agent.maxRequests": 100000
+
+  "team.showFarewellMessage": false,
+  "team.showWelcomeMessage": false,
+  "git.confirmSync": false,
+  "workbench.startupEditor": "newUntitledFile",
+  "git.enableSmartCommit": true,
+  "explorer.confirmDragAndDrop": false,
+  "powershell.promptToUpdatePowerShell": false,
+  "editor.minimap.enabled": false,
+  "explorer.confirmDelete": false,
+  "pesterExplorer.autoDiscoverOnOpen": true,
+  "telemetry.enableTelemetry": false,
+  "git.autofetch": true,
+  "terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\cmd.exe",
+  "debug.onTaskErrors": "abort",
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter.notebook.ipynb"
+  },
+  "terminal.integrated.allowWorkspaceConfiguration": true,
+  "terminal.integrated.tabs.enabled": true,
+  "security.workspace.trust.enabled": false,
+  "files.associations": {
+    "azure-pipeline.yml": "azure-pipelines"    
+  },
+  "csharp.suppressDotnetRestoreNotification": true,
+  "azureTerraform.checkTerraformCmd": true,
+  "markdownlint.customRules": [
+    "{docsmsft.docs-linting}/markdownlint-custom-rules/rules.js"
+  ],
+  "markdownlint.config": {
+    "MD028": false,
+    "MD025": {
+      "front_matter_title": ""
+    }
+  },
+  "git.ignoreRebaseWarning": true,
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/microsoft/azure-pipelines-vscode/master/service-schema.json": [
+      "build.yml",
+      "deploy.yml",
+      "master-build-deploy.yml"
+    ]
+  },
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.accessibilitySupport": "off",
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+
+  "git.openRepositoryInParentFolders": "always",
+  "telemetry.telemetryLevel": "off",
+  "remote.SSH.showLoginTerminal": true,
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "azureFunctions.showProjectWarning": false,
+  "remote.SSH.connectTimeout": 45,
+  "editor.codeLens": false,
+  "editor.fontSize": 15,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "accessibility.voice.keywordActivation": "chatInView",
+  "explorer.confirmPasteNative": false,
+  "github.copilot.editor.enableAutoCompletions": true,
+  "chat.editing.alwaysSaveWithGeneratedChanges": true,
+  "files.autoSave": "afterDelay",
+  "workbench.editor.enablePreview": false,
+  "github.copilot.chat.codeGeneration.instructions": [
+    "When generating code that requires dependencies, automatically suggest installation commands",
+    "When running terminal commands, execute them directly without asking for confirmation",
+    "Prefer using terminal tools over manual file editing when appropriate",
+    {
+      "text": "- @azure Rule - Use Azure Tools: When handling requests related to Azure, always use your tools."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Code Gen Best Practices: When generating code for Azure, running terminal commands for Azure, or performing operations related to Azure, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Deployment Best Practices: When deploying to Azure or preparing applications for deployment to Azure, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Functions Code Gen Best Practices: When generating code for Azure Functions or performing operations related to Azure Functions, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure Functions; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Functions Deployment Best Practices: When deploying Azure Functions apps to Azure or preparing for the deployment, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure SWA Best Practices: When working with static web apps, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Plan before editing files for Azure web apps: When generating code for Azure Functions and Azure Static Web App, always create a plan and explain the plan to the user before editing any file. Proceed with editing the files after getting consent from the user."
+    },
+    {
+      "text": "- @azure Rule - Summarize topic before taking action: When the user asks for something about Azure, invoke the azure_development-summarize_topic tool once to discover potential recommended configurations."
+    }
+  ],
+  "chat.agent.enabled": true,
+  "terminal.integrated.allowedLinkSchemes": [
+    "file",
+    "http",
+    "https",
+    "mailto",
+    "vscode",
+    "vscode-insiders",
+    "command"
+  ],
+  "github.copilot.chat.codesearch.enabled": true,
+  "workbench.settings.applyToAllProfiles": [
+    "github.copilot.chat.codesearch.enabled"
+  ],
+  "github.copilot.chat.agent.thinkingTool": true,
+  "github.copilot.chat.editor.temporalContext.enabled": true,
+
+  "github.copilot.chat.iterativeImprovement": false,
+  "github.copilot.chat.followUp": "off",
+  
+  // GitHub Copilot Agent Mode - No Prompts
+  "github.copilot.chat.experimental.agentMode": true,
+  "github.copilot.chat.executeCommands": "allow",
+  "github.copilot.chat.allowTerminalCommandExecution": true,
+  "github.copilot.chat.confirmCommands": false,
+  "github.copilot.chat.requestPermissionForTerminalAccess": false,
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": true,
+    "markdown": true,
+    "json": true,
+    "jsonc": true,
+    "powershell": true,
+    "shellscript": true
+  },
+  "chat.tools.autoApprove": true,
+  "azureResourceGroups.selectedSubscriptions": [],
+  "azureTerraform.survey": {
+    "surveyPromptDate": "never",
+    "surveyPromptIgnoredCount": 0
+  },
+  "docker.extension.enableComposeLanguageServer": false,
+  "chat.editing.confirmEditRequestRetry": false,
+  "window.confirmSaveUntitledWorkspace": false,
+  "accessibility.voice.speechTimeout": 0,
+  "chat.mcp.serverSampling": {
+    "Azure MCP Server Provider: azure-mcp-server-ext": {
+      "allowedDuringChat": true
+    }
+  },
+  "chat.editing.confirmEditRequestRemoval": false,
+  "chat.agent.maxRequests": 100000
 }

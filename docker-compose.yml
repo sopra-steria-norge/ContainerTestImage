@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  containerpipelinetest:
-    image: cloudacademyacr.azurecr.io/containerpipelinetest:latest
+  containertestimage:
+    image: cloudacademyacr.azurecr.io/containertestimage:latest
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
-    container_name: containerpipelinetest-1
+    container_name: containertestimage-1
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5024

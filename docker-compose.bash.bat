@@ -1,1 +1,1 @@
-docker exec -it containerpipelinetest-1 /bin/bash
+docker exec -it containertestimage-1 /bin/bash

@@ -1,2 +1,2 @@
-docker logs -f containerpipelinetest-1
+docker logs -f containertestimage-1
 pause

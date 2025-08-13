@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/ContainerTestImage/bin/Debug/net6.0/ContainerTestImage.dll",
+            "program": "${workspaceFolder}/src/ContainerTestImage/bin/Debug/net8.0/ContainerTestImage.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/ContainerTestImage",
             "stopAtEntry": false,
