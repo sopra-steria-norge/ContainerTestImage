@@ -16,5 +16,6 @@
     "github.copilot.advanced": {
         "inlineSuggestCount": 3,
         "inlineSuggestDelay": 100
-    }
+    },
+    "chat.agent.maxRequests": 100000
 }

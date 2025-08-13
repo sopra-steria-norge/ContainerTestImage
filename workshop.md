@@ -36,7 +36,7 @@ MSAL brukes til å autentisere brukere i webklienten, slik at den kan kommuniser
 
 ![](assets/2023-11-29-09-24-42-image.png)
 
-## Registrer din App Registration i ContainerPipelineTest
+## Registrer din App Registration i ContainerTestImage
 
 1. Finn filen "**appsettings.json**"
 

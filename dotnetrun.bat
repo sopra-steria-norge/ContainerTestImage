@@ -1,3 +1,3 @@
-cd %~dp0/src/ContainerPipelineTest
-dotnet run --launch-profile ContainerPipelineTest
+cd %~dp0/src/ContainerTestImage
+dotnet run --launch-profile ContainerTestImage
 pause

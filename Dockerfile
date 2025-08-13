@@ -35,16 +35,16 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["nuget.config", "."]
-COPY ["src/ContainerPipelineTest/ContainerPipelineTest.csproj", "ContainerPipelineTest/"]
-RUN dotnet restore "ContainerPipelineTest/ContainerPipelineTest.csproj"
+COPY ["src/ContainerTestImage/ContainerTestImage.csproj", "ContainerTestImage/"]
+RUN dotnet restore "ContainerTestImage/ContainerTestImage.csproj"
 COPY src/ .
-WORKDIR "/src/ContainerPipelineTest"
-RUN dotnet build "ContainerPipelineTest.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/ContainerTestImage"
+RUN dotnet build "ContainerTestImage.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Publish
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ContainerPipelineTest.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./ContainerTestImage.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Final image
 FROM base AS final

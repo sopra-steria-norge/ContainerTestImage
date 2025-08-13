@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 
-namespace ContainerPipelineTest.Msal
+namespace ContainerTestImage.Msal
 {
 
     public static class AuthenticationInstaller

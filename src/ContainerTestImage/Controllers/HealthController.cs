@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
-namespace ContainerPipelineTest.Controllers
+namespace ContainerTestImage.Controllers
 {
     [ApiController]
     public class HealthController : ControllerBase

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace ContainerPipelineTest.Models
+namespace ContainerTestImage.Models
 {
     public class SampleModel
     {

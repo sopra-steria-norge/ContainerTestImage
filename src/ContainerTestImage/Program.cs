@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using ContainerPipelineTest.Models;
+using ContainerTestImage.Models;
 using Microsoft.Identity.Web;
-using ContainerPipelineTest.Msal;
+using ContainerTestImage.Msal;
 
-namespace ContainerPipelineTest
+namespace ContainerTestImage
 {
 
     public class Program
@@ -32,7 +32,7 @@ namespace ContainerPipelineTest
             var clientSecret = builder.Configuration.GetSection("AzureAd")["ClientSecret"];
             app.UseSwaggerUI(c =>
             {
-                //c.SwaggerEndpoint($"/swagger/1.0/swagger.json", "ContainerPipelineTest API");
+                //c.SwaggerEndpoint($"/swagger/1.0/swagger.json", "ContainerTestImage API");
                 c.OAuthClientId(clientId);
                 c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace ContainerPipelineTest.Controllers
+namespace ContainerTestImage.Controllers
 {
     [ApiController]
     public class ApplicationInsightController : ControllerBase

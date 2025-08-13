@@ -3,8 +3,8 @@
 
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-$Source="ContainerPipelineTest"
-$Target="ContainerPipelineTest"
+$Source="ContainerTestImage"
+$Target="ContainerTestImage"
 
 Get-ChildItem -Filter "*" -Recurse | ForEach {  (Get-Content $_.PSPath | ForEach {$_ -creplace $Source, $Target}) | Set-Content $_.PSPath }
    

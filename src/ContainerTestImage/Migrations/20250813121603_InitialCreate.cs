@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace ContainerPipelineTest.Migrations
+namespace ContainerTestImage.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

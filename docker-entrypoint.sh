@@ -2,4 +2,4 @@
 
 nohup /usr/sbin/sshd -D & disown
 
-dotnet ContainerPipelineTest.dll
+dotnet ContainerTestImage.dll
