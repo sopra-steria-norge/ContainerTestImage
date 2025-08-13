@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS base
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
 
 ####################################################################################
 ### Requirements for implementing MSAL authentication: libsecret-1-dev 
@@ -29,30 +29,31 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
+
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["nuget.config", "."]
+COPY ["src/ContainerPipelineTest/ContainerPipelineTest.csproj", "ContainerPipelineTest/"]
+RUN dotnet restore "ContainerPipelineTest/ContainerPipelineTest.csproj"
 COPY src/ .
+WORKDIR "/src/ContainerPipelineTest"
+RUN dotnet build "ContainerPipelineTest.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-# WORKDIR /src
-# COPY ["src/ContainerPipelineTest/ContainerPipelineTest.csproj", "ContainerPipelineTest/"]
-# RUN dotnet restore "ContainerPipelineTest/ContainerPipelineTest.csproj"
-# COPY src/ .
-# WORKDIR "/src/ContainerPipelineTest"
-# RUN dotnet build "ContainerPipelineTest.csproj" -c Release -o /app/build
+# Publish
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./ContainerPipelineTest.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# FROM build AS publish
-# RUN dotnet publish "ContainerPipelineTest.csproj" -c Release -o /app/publish
+# Final image
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 
-# FROM base AS final
-# WORKDIR /app
-# COPY --from=publish /app/publish .
+# Entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN dos2unix /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# # ENTRYPOINT ["dotnet", "ContainerPipelineTest.dll"]
-# # Copy source files into the container for testing purposes using Remote SSH
-# COPY . /root/ContainerPipelineTest
-
-# COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-# RUN dos2unix /usr/local/bin/docker-entrypoint.sh \
-#     && chmod +x /usr/local/bin/docker-entrypoint.sh
-# ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

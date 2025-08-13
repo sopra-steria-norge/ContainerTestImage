@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using ContainerPipelineTest.Models;
 using Microsoft.Identity.Web;
 using ContainerPipelineTest.Msal;
 
@@ -15,6 +17,13 @@ namespace ContainerPipelineTest
 
             var app = builder.Build();
 
+            // Run EF Core migrations automatically on startup
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.Database.Migrate();
+            }
+
             app.UseHttpsRedirection();
 
             // specifying the Swagger JSON endpoint.
@@ -26,7 +35,7 @@ namespace ContainerPipelineTest
                 //c.SwaggerEndpoint($"/swagger/1.0/swagger.json", "ContainerPipelineTest API");
                 c.OAuthClientId(clientId);
                 c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
-            });            
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -57,6 +66,10 @@ namespace ContainerPipelineTest
                 c.InstallSwaggerAuthentication(configuration);
                 c.DescribeAllParametersInCamelCase();
             });
+
+            // Register AppDbContext with connection string
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultDatabase")));
 
             services.InstallAzureAdAuthentication(configuration);
 

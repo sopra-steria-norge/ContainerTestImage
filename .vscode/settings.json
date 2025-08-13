@@ -1,0 +1,20 @@
+    {
+        // Enable Copilot Labs features
+    "github.copilot.enableLabs": true,
+
+    // Enable Copilot Chat Inline Chat Suggestions
+    "github.copilotChat.inlineChatSuggestions.enabled": true,
+
+    // (Optional, but recommended to ensure feature appears) Do not suppress terminal command suggestions
+    "github.copilotChat.suppressTerminalCommandSuggestions": false,
+
+    // (Optional, but useful) Enable Copilot Chat and Inline Chat for all languages
+    "github.copilot.inlineSuggest.enable": true,
+    "github.copilotChat.enabled": true,
+
+    // (Optional) Increase suggestion visibility (tweak as needed)
+    "github.copilot.advanced": {
+        "inlineSuggestCount": 3,
+        "inlineSuggestDelay": 100
+    }
+}

@@ -1,0 +1,93 @@
+# Azure DevOps Pipeline for .NET 8, Container, and Database Migration
+# See guide for full details. Place in root as azure-pipelines.yml if not using templates.
+
+trigger:
+  batch: "true"
+  branches:
+    include:
+      - main
+
+variables:
+  - name: containerRegistry
+    value: yourregistry
+  - name: containerImageName
+    value: yourapplication
+
+parameters:
+  - name: buildContext
+    default: "**"
+  - name: vmImageName
+    default: ubuntu-22.04
+
+  - name: dev
+    type: object
+    default:
+      webAppName: your-d-app-yourapplication
+      environment: dev
+      servicemanifestFilename: yourapplication.dev.json
+      resourceGroup: your-d-rg-yourapplication
+      azureSubscription: your-d-sp-deploy-yourapplication
+      keyVaultName: your-d-yourapplication-kv
+      deploymentEnvironment: yourapplication-dev
+      sqlServerName: your-d-sql-server
+
+  - name: prod
+    type: object
+    default:
+      webAppName: your-p-app-yourapplication
+      environment: prod
+      servicemanifestFilename: yourapplication.prod.json
+      resourceGroup: your-p-rg-yourapplication
+      azureSubscription: your-p-sp-deploy-yourapplication
+      keyVaultName: your-p-yourapplication-kv
+      deploymentEnvironment: yourapplication-prod
+      sqlServerName: your-p-sql-server
+
+stages:
+  - stage: BuildStage
+    displayName: Build
+    jobs:
+      - job: BuildJob
+        displayName: Build and push container image
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Docker@2
+            displayName: Build and push image
+            inputs:
+              containerRegistry: '$(containerRegistry)'
+              repository: '$(containerImageName)'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+              buildContext: '$(buildContext)'
+              tags: |
+                $(Build.BuildId)
+                latest
+
+  - stage: DeployDev
+    dependsOn: BuildStage
+    displayName: Deploy to Development
+    jobs:
+      - job: DatabaseMigrationJob
+        displayName: Run Database Migration
+        steps:
+          - task: AzureCLI@2
+            displayName: Run EF Core Migrations
+            inputs:
+              azureSubscription: ${{ parameters.dev.azureSubscription }}
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                dotnet tool restore
+                dotnet ef database update -v --connection "Server=tcp:${{ parameters.dev.sqlServerName }}.database.windows.net,1433;Initial Catalog=${{ parameters.containerImageName }};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=Active Directory Default;"
+
+      - job: DeployJob
+        displayName: Deploy Container to App Service
+        dependsOn: DatabaseMigrationJob
+        steps:
+          - task: AzureWebAppContainer@1
+            displayName: Deploy to Azure App Service
+            inputs:
+              azureSubscription: ${{ parameters.dev.azureSubscription }}
+              appName: ${{ parameters.dev.webAppName }}
+              containers: $(containerRegistry).azurecr.io/$(containerImageName):$(Build.BuildId)
