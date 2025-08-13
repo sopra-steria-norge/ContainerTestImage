@@ -1,8 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System;
 using System.Threading.Tasks;
 using ContainerTestImage.Database;
+using ContainerTestImage.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ContainerTestImage.Controllers
 {
@@ -10,10 +16,17 @@ namespace ContainerTestImage.Controllers
     public class HealthController : ControllerBase
     {
         private readonly ContainerTestImageContext _context;
+        private readonly IDatabaseMigrator _databaseMigrator;
+        private readonly ILogger<HealthController> _logger;
 
-        public HealthController(ContainerTestImageContext context)
+        public HealthController(
+            ContainerTestImageContext context,
+            IDatabaseMigrator databaseMigrator,
+            ILogger<HealthController> logger)
         {
             _context = context;
+            _databaseMigrator = databaseMigrator;
+            _logger = logger;
         }
 
         /// <summary>
@@ -46,18 +59,51 @@ namespace ContainerTestImage.Controllers
 
         // [Authorize]
         [HttpGet("health/database")]
-        public string HealthDatabase()
+        [SwaggerOperation(Summary = "Database health check", Description = "Returns the health status of the database connection")]
+        public async Task<ActionResult<object>> HealthDatabase()
         {
             try
             {
-                // Test database connection
-                _context.Database.CanConnect();
+                var stopwatch = Stopwatch.StartNew();
+                var canConnect = await _context.Database.CanConnectAsync();
+                stopwatch.Stop();
+                
+                if (!canConnect)
+                {
+                    _logger.LogWarning("Database health check failed: Cannot connect to database");
+                    return StatusCode(503, new
+                    {
+                        Status = "Unhealthy",
+                        Message = "Cannot connect to database",
+                        DataSource = _context.GetConnectionStringDataSource(),
+                        Timestamp = DateTime.UtcNow,
+                        ResponseTimeMs = stopwatch.ElapsedMilliseconds
+                    });
+                }
 
-                return "OK";
+                // If we can connect, perform a simple query
+                var sampleCount = await _context.Samples.CountAsync();
+                
+                return Ok(new
+                {
+                    Status = "Healthy",
+                    Message = "Database connection successful",
+                    DataSource = _context.GetConnectionStringDataSource(),
+                    SampleRecordCount = sampleCount,
+                    Timestamp = DateTime.UtcNow,
+                    ResponseTimeMs = stopwatch.ElapsedMilliseconds
+                });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"Tjenesten klarer ikke å koble seg til databasen: {_context.GetConnectionStringDataSource()}");
+                _logger.LogError(ex, "Database health check failed with exception");
+                return StatusCode(503, new
+                {
+                    Status = "Unhealthy",
+                    Message = ex.Message,
+                    DataSource = _context.GetConnectionStringDataSource(),
+                    Timestamp = DateTime.UtcNow
+                });
             }
         }
 
@@ -90,14 +136,27 @@ namespace ContainerTestImage.Controllers
                 }
             }
         }
-
-
-        [Authorize]
-        [HttpGet("debug/migratedatabase")]
-        public string Migratedatabase()
+        
+        [HttpGet("health/database/status")]
+        [SwaggerOperation(Summary = "Database migration status", Description = "Returns the status of database migrations")]
+        public async Task<ActionResult<object>> GetDatabaseStatus()
         {
-            _context.MigrateDatabase();
-            return "OK";
+            try
+            {
+                var status = await _databaseMigrator.GetDatabaseInfoAsync();
+                return Ok(status);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve database migration status");
+                return StatusCode(500, new
+                {
+                    Status = "Failed",
+                    Message = ex.Message,
+                    DataSource = _context.GetConnectionStringDataSource(),
+                    Timestamp = DateTime.UtcNow
+                });
+            }
         }
     }
 }

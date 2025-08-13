@@ -25,6 +25,15 @@ namespace ContainerTestImage.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure entity relationships and constraints
+            modelBuilder.Entity<Sample>(entity =>
+            {
+                entity.HasKey(e => e.SampleId);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+            });
         }
 
         public string GetConnectionStringDataSource()
@@ -36,6 +45,32 @@ namespace ContainerTestImage.Database
         public void MigrateDatabase()
         {
             Database.Migrate();
+            SeedData();
+        }
+
+        private void SeedData()
+        {
+            // Only seed if there's no data in the Samples table
+            if (!Samples.Any())
+            {
+                Samples.AddRange(
+                    new Sample
+                    {
+                        Name = "First Sample",
+                        Description = "This is the first sample record created automatically during migration",
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true
+                    },
+                    new Sample
+                    {
+                        Name = "Second Sample",
+                        Description = "This is the second sample record created automatically during migration",
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true
+                    }
+                );
+                SaveChanges();
+            }
         }
     }
 }

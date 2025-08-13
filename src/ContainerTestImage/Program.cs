@@ -1,9 +1,12 @@
 using Microsoft.Identity.Web;
 using ContainerTestImage.Msal;
 using ContainerTestImage.Database;
+using ContainerTestImage.Services;
 using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
+using Microsoft.AspNetCore.Http;
+using Scrutor;
 
 namespace ContainerTestImage
 {
@@ -20,7 +23,23 @@ namespace ContainerTestImage
 
             // Configure DbContext with SQL Server
             builder.Services.AddDbContext<ContainerTestImageContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("ContainerTestImageDatabase")));
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("ContainerTestImage"),
+                    sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: builder.Configuration.GetValue<int>("Database:MaxRetryCount", 3),
+                            maxRetryDelay: TimeSpan.FromSeconds(builder.Configuration.GetValue<int>("Database:MaxRetryDelay", 5)),
+                            errorNumbersToAdd: null);
+                        
+                        sqlOptions.CommandTimeout(builder.Configuration.GetValue<int>("Database:CommandTimeout", 30));
+                        
+                        // Configure additional SQL Server options if needed
+                        if (builder.Configuration.GetValue<bool>("Database:EnableSensitiveDataLogging", false))
+                        {
+                            options.EnableSensitiveDataLogging();
+                        }
+                    }));
 
 
             var app = builder.Build();
@@ -43,13 +62,22 @@ namespace ContainerTestImage
 
             app.MapControllers();
 
-            // // Apply migrations automatically at startup
+            // Apply migrations automatically at startup
             // using (var scope = app.Services.CreateScope())
             // {
-            //     var dbContext = scope.ServiceProvider.GetRequiredService<ContainerTestImageContext>();
-            //     dbContext.Database.Migrate();
+            //     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            //     try
+            //     {
+            //         logger.LogInformation("Applying database migrations on startup");
+            //         var migrator = scope.ServiceProvider.GetRequiredService<DatabaseMigrator>();
+            //         migrator.MigrateDatabaseAsync().Wait();
+            //         logger.LogInformation("Database migrations applied successfully");
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         logger.LogError(ex, "An error occurred while applying database migrations");
+            //     }
             // }
-
 
             app.Run();
         }
