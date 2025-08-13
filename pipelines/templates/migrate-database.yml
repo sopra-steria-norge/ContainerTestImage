@@ -1,0 +1,68 @@
+parameters:
+  - name: azureSubscription
+  - name: sqlServerName
+  - name: sqlDatabaseName
+
+jobs:
+  - job: DatabaseMigrationInfoJob
+    displayName: Info
+    steps:
+      - script: |
+          echo azureSubscription: ${{ parameters.azureSubscription }}
+          echo sqlServerName: ${{ parameters.sqlServerName }}
+          echo sqlServerName: ${{ parameters.sqlDatabaseName }}
+
+  - job: DatabaseMigrationJob
+    displayName: Migrate database
+    pool:
+      name: Platform
+      demands:
+      - agent.name -equals demo-cd-app-azuredevopsbuildagent
+
+    steps:
+
+      # - bash: |
+      #     echo "This task will fail"
+      #     exit 1
+      #   displayName: 'Fail on Purpose'
+
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk 8.x'
+        inputs:
+          packageType: 'sdk'
+          version: '8.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+
+      # - script: |
+      #     echo "Installing/updating EF Core CLI"
+      #     dotnet tool update --global dotnet-ef --version 8.0.0
+      #     dotnet ef --version
+      #   displayName: 'Install EF Core CLI'
+
+
+      - task: AzureCLI@2
+        displayName: az login
+        inputs:
+          azureSubscription: ${{ parameters.azureSubscription }}
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az --version
+            az account show
+
+      - task: NuGetAuthenticate@1
+        displayName: 'NuGet Authenticate'
+
+      - task: AzureCLI@2
+        displayName: Apply EF Core Migrations      
+        inputs:
+          azureSubscription: ${{ parameters.azureSubscription }}
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          workingDirectory: $(System.DefaultWorkingDirectory)/src/ContainerTestImage      
+          inlineScript: |
+            echo "Listing files in the project directory:"
+            pwd
+            ls -la
+            dotnet tool restore      
+            dotnet ef database update -v --connection "Server=tcp:${{ parameters.sqlServerName }}.database.windows.net,1433;Initial Catalog=${{ parameters.sqlDatabaseName }};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=Active Directory Default;" 

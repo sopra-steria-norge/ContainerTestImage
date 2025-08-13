@@ -21,7 +21,7 @@ namespace ContainerTestImage.Msal
             serviceCollection.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(configuration, "AzureAd")                
                 .EnableTokenAcquisitionToCallDownstreamApi()
-                // .AddDownstreamWebApi(WebApiNames.SomeService, configuration.GetSection(WebApiNames.SomeService))
+                // .AddDownstreamWebApi(WebApiNames.ContainerTestImage, configuration.GetSection(WebApiNames.ContainerTestImage))
                 .AddInMemoryTokenCaches();
         }
 

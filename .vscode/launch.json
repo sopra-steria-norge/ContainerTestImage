@@ -21,8 +21,7 @@
                 "uriFormat": "%s/swagger"
             },
             "env": {                     
-                "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://localhost:5202"
+                "ASPNETCORE_ENVIRONMENT": "Development"
                 // Bruk kun appsettings.json til env
             }
         },

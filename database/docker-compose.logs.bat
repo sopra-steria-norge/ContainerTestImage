@@ -1,3 +1,2 @@
-#!/bin/bash
-
-docker compose -f docker-compose.database.yml logs -f
+docker logs -f mssql-1
+pause

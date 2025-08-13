@@ -8,7 +8,7 @@ docker rm -f containertestimage-1
 
 docker-compose -f docker-compose.yml down --remove-orphans
 
-docker network create -d overlay --attachable clac_common_network
+docker network create -d overlay --attachable demo_common_network
 
 @REM docker-compose -f docker-compose.yml build --no-cache containertestimage
 

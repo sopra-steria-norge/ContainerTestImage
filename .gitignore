@@ -362,5 +362,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 .vs
-
-!clac-d-kv-apps-test-clac-no-20220805.pfx

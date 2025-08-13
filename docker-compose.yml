@@ -1,11 +1,13 @@
-version: '3.8'
+name: containertestimage
 
 services:
   containertestimage:
-    image: cloudacademyacr.azurecr.io/containertestimage:latest
+    image: demoacr.azurecr.io/containertestimage:latest
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NUGET_PAT: ${DEMO_NUGET_PAT} # Pass the environment variable as the build argument
     restart: always
     container_name: containertestimage-1
     environment:
@@ -19,10 +21,10 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
-      - clac_common_network
+      - demo_common_network
 networks:
-  clac_common_network:
-    name: clac_common_network
+  demo_common_network:
+    name: demo_common_network
     external: true
 volumes:
   kestrel_certificate: {}    

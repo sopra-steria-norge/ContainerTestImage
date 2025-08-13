@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 nohup /usr/sbin/sshd -D & disown
 

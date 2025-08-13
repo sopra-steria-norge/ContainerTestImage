@@ -1,7 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using ContainerTestImage.Models;
 using Microsoft.Identity.Web;
 using ContainerTestImage.Msal;
+using ContainerTestImage.Database;
+using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Extensions.Http;
 
 namespace ContainerTestImage
 {
@@ -12,17 +14,16 @@ namespace ContainerTestImage
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
             // Add services to the container.
             ConfigureServices(builder.Services, builder.Configuration);
 
-            var app = builder.Build();
+            // Configure DbContext with SQL Server
+            builder.Services.AddDbContext<ContainerTestImageContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("ContainerTestImageDatabase")));
 
-            // Run EF Core migrations automatically on startup
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                dbContext.Database.Migrate();
-            }
+
+            var app = builder.Build();
 
             app.UseHttpsRedirection();
 
@@ -42,6 +43,14 @@ namespace ContainerTestImage
 
             app.MapControllers();
 
+            // // Apply migrations automatically at startup
+            // using (var scope = app.Services.CreateScope())
+            // {
+            //     var dbContext = scope.ServiceProvider.GetRequiredService<ContainerTestImageContext>();
+            //     dbContext.Database.Migrate();
+            // }
+
+
             app.Run();
         }
 
@@ -59,22 +68,34 @@ namespace ContainerTestImage
                 options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
                 options.HandleSameSiteCookieCompatibility();
             });
-            
+
             services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
             services.AddSwaggerGen(c =>
             {
                 c.InstallSwaggerAuthentication(configuration);
                 c.DescribeAllParametersInCamelCase();
+                c.EnableAnnotations(); // Enable Swagger annotations
             });
-
-            // Register AppDbContext with connection string
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultDatabase")));
 
             services.InstallAzureAdAuthentication(configuration);
 
             // Match each Interface with the .First() implementation it finds.
             services.Scan(a => a.FromAssemblyOf<Program>().AddClasses(publicOnly: true).AsMatchingInterface());
+
+
+        }
+
+        private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    onRetry: (outcome, timespan, retryCount, context) =>
+                    {
+                        Console.WriteLine($"Retry {retryCount} after {timespan} seconds");
+                    });
         }
     }
 }

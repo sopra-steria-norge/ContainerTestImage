@@ -44,8 +44,8 @@ MSAL brukes til å autentisere brukere i webklienten, slik at den kan kommuniser
 {
    "AzureAd": {
       "Instance": "https://login.microsoftonline.com/",
-      "ClientId": "api://clac-d-entra-containertestimage",
-      "Audience": "api://clac-d-entra-containertestimage",
+      "ClientId": "api://demo-d-entra-containertestimage",
+      "Audience": "api://demo-d-entra-containertestimage",
       "TenantId": "8b87af7d-8647-4dc7-8df4-5f69a2011bb5",
       "ClientSecret": ""
    }

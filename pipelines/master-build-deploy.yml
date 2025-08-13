@@ -1,84 +1,91 @@
 # PIPELINE TEMPLATE FOR CONTAINERIZED APPLICATIONS
 # Replace the values under the variables and parameters section below to suit your application.
-# 
+#
 # This template uses Servicemanifest, and "replacetokens@3" to replace  with prefix $( and suffix ) with values from Azure Keyvault
-# 
+#
 
 trigger:
   batch: "true"
   branches:
     include:
       - master
-      - azure-main
 
 resources:
   repositories:
   - repository: Servicemanifest
     type: git
     name: Platform/Servicemanifest
-    ref: master
+    ref: refs/heads/master
 
   - repository: Pipelines
     type: git
     name: Platform/Pipelines
     ref: refs/heads/master
 
-#######################################################  
+#######################################################
 ###### Non-env-specific Variables & Parameters ########
 variables:
   - name: containerRegistry
-    value: cloudacademyacr
+    value: demoacr
   - name: containerImageName
     value: containertestimage
 
 parameters:
   - name: buildContext
-    default: "**" 
+    default: "**"
   - name: vmImageName
     default: ubuntu-22.04
+
 
   - name: dev
     type: object
     default:
-      webAppName: clac-d-app-containertestimage
+      webAppName: demo-d-app-containertestimage
       environment: dev
-      tjenestemanifestFilename: containertestimage.dev.json
-      resourceGroup: clac-d-rg-containertestimage
-      azureSubscription: clac-d-sp-deploy-containertestimage
-      keyVaultName: clac-d-containerpipetest # Name is shortened because of limitations of Azure Key Vault of 24 characters
+      environmentDisplayName: Dev # Can not contain whitespace or special characters
+      servicemanifestFilename: containertestimage.dev.json
+      resourceGroup: demo-d-rg-containertestimage
+      azureSubscription: demo-d-sp-deploy-containertestimage
+      keyVaultName: demo-d-containerpipetest # Name is shortened because of limitations of Azure Key Vault of 24 characters
       deploymentEnvironment: containertestimage-dev
+      sqlServerName: demo-d-sql-server
 
-  # - name: test
-  #   type: object
-  #   default:
-  #     webAppName: clac-t-app-containertestimage
-  #     environment: test
-  #     tjenestemanifestFilename: containertestimage.test.json
-  #     resourceGroup: clac-t-rg-containertestimage
-  #     azureSubscription: clac-t-sp-containertestimage
-  #     keyVaultName: clac-t-contpipelinetest
-  #     deploymentEnvironment: containertestimage-test
+  - name: test
+    type: object
+    default:
+      webAppName: demo-t-app-containertestimage
+      environment: test
+      environmentDisplayName: Test # Can not contain whitespace or special characters
+      servicemanifestFilename: containertestimage.test.json
+      resourceGroup: demo-t-rg-containertestimage
+      azureSubscription: demo-t-sp-deploy-containertestimage
+      keyVaultName: demo-t-containerpipetest # Name is shortened because of limitations of Azure Key Vault of 24 characters
+      deploymentEnvironment: containertestimage-test
+      sqlServerName: demo-t-sql-server
 
-  # - name: prod
-  #   type: object
-  #   default:
-  #     webAppName: clac-p-app-containertestimage
-  #     environment: prod
-  #     tjenestemanifestFilename: containertestimage.prod.json
-  #     resourceGroup: clac-p-rg-containertestimage
-  #     azureSubscription: clac-p-sp-containertestimage
-  #     keyVaultName: clac-p-contpipelinetest
-  #     deploymentEnvironment: containertestimage-prod
+  - name: prod
+    type: object
+    default:
+      webAppName: demo-p-app-containertestimage
+      environment: prod
+      environmentDisplayName: Prod # Can not contain whitespace or special characters
+      servicemanifestFilename: containertestimage.prod.json
+      resourceGroup: demo-p-rg-containertestimage
+      azureSubscription: demo-p-sp-deploy-containertestimage
+      keyVaultName: demo-p-containerpipeprod # Name is shortened because of limitations of Azure Key Vault of 24 characters
+      deploymentEnvironment: containertestimage-prod
+      sqlServerName: demo-p-sql-server
 
 ##             END OF PARAMETERS SECTION              ##
 ##         NOTHING BELOW NEEDS TO BE CHANGED          ##
 ########################################################
-      
-########################################################
-#################   Build    ###########################
 
 stages:
-  - stage: Bygg
+
+  ########################################################
+  #################   Build    ###########################
+  - stage: BuildStage
+    displayName: Build
     jobs:
       - template: container/pipelines/templates/containerimage-build.yml@Pipelines       
         parameters:
@@ -87,50 +94,109 @@ stages:
           vmImageName: ${{ parameters.vmImageName }}
           buildContext: ${{ parameters.buildContext }}
 
+
 ########################################################
-##############     Deploy: Dev     #####################
+##############     Deploy: Dev          ################
 
-  - template: container/pipelines/deploy.generic.yml@Pipelines      
-    parameters:
-      webAppName: ${{ parameters.dev.webAppName }}
-      environment: ${{ parameters.dev.environment }}
-      tjenestemanifestFilename: ${{ parameters.dev.tjenestemanifestFilename }}
-      resourceGroup: ${{ parameters.dev.resourceGroup }}
-      azureSubscription: ${{ parameters.dev.azureSubscription }}
-      keyVaultName: ${{ parameters.dev.keyVaultName }}  
-      deploymentEnvironment: ${{ parameters.dev.deploymentEnvironment }}  
-      containerImageName: ${{ variables.containerImageName }}
-      containerRegistry: ${{ variables.containerRegistry }}
-      dependsOn: Bygg
+  - stage: Deploy${{ parameters.dev.environmentDisplayName }}
+    dependsOn: BuildStage    
+    displayName: Deploy ${{ parameters.dev.environmentDisplayName }}
+    jobs:
+      - template: templates/migrate-database.yml
+        parameters:
+          azureSubscription: ${{ parameters.dev.azureSubscription }}
+          sqlServerName: ${{ parameters.dev.sqlServerName }}
+          sqlDatabaseName: ${{ variables.containerImageName }}
 
-# ########################################################
-# ##############     Deploy: Test    #####################
+      - template: container/pipelines/templates/servicemanifest.yml@Pipelines
+        parameters:
+          webAppName: ${{ parameters.dev.webAppName }}
+          environment: ${{ parameters.dev.environment }}
+          servicemanifestFilename: ${{ parameters.dev.servicemanifestFilename }}
+          resourceGroup: ${{ parameters.dev.resourceGroup }}
+          azureSubscription: ${{ parameters.dev.azureSubscription }}
+          keyVaultName: ${{ parameters.dev.keyVaultName }}
+          dependsOn: DatabaseMigrationJob
 
-#   - template: container/pipelines/deploy.generic.yml@Pipelines      
-#     parameters:
-#       webAppName: ${{ parameters.test.webAppName }}
-#       environment: ${{ parameters.test.environment }}
-#       tjenestemanifestFilename: ${{ parameters.test.tjenestemanifestFilename }}
-#       resourceGroup: ${{ parameters.test.resourceGroup }}
-#       azureSubscription: ${{ parameters.test.azureSubscription }}
-#       keyVaultName: ${{ parameters.test.keyVaultName }}  
-#       deploymentEnvironment: ${{ parameters.test.deploymentEnvironment }}  
-#       containerImageName: ${{ variables.containerImageName }}
-#       containerRegistry: ${{ variables.containerRegistry }}
-#       dependsOn: Deploy${{ replace( parameters.dev.webAppName,'-','_' )}}  
+      - template: container/pipelines/templates/containerimage-deploy.yml@Pipelines
+        parameters:
+          webAppName: ${{ parameters.dev.webAppName }}
+          environment: ${{ parameters.dev.environment }}
+          resourceGroup: ${{ parameters.dev.resourceGroup }}
+          azureSubscription: ${{ parameters.dev.azureSubscription }}
+          deploymentEnvironment: ${{ parameters.dev.deploymentEnvironment }}
+          containerImageName: ${{ variables.containerImageName }}
+          containerRegistry: ${{ variables.containerRegistry }}
+          # containerImageTag: 98c797a23b6a402b5881d9de21dad0b7d524bd2c
+          dependsOn: UpdateAppSettings
 
-# ########################################################
-# ##############     Deploy: Prod    #####################
 
-#   - template: container/pipelines/deploy.generic.yml@Pipelines      
-#     parameters:
-#       webAppName: ${{ parameters.prod.webAppName }}
-#       environment: ${{ parameters.prod.environment }}
-#       tjenestemanifestFilename: ${{ parameters.prod.tjenestemanifestFilename }}
-#       resourceGroup: ${{ parameters.prod.resourceGroup }}
-#       azureSubscription: ${{ parameters.prod.azureSubscription }}
-#       keyVaultName: ${{ parameters.prod.keyVaultName }}  
-#       deploymentEnvironment: ${{ parameters.prod.deploymentEnvironment }}  
-#       containerImageName: ${{ variables.containerImageName }}
-#       containerRegistry: ${{ variables.containerRegistry }}
-#       dependsOn: Deploy${{ replace( parameters.test.webAppName,'-','_' )}}  
+########################################################
+##############     Deploy: Test    #####################
+
+  - stage: Deploy${{ parameters.test.environment }}
+    dependsOn: Deploy${{ parameters.dev.environment }}    
+    displayName: Deploy ${{ parameters.test.environment }}
+    jobs:
+      - template: templates/migrate-database.yml
+        parameters:
+          azureSubscription: ${{ parameters.test.azureSubscription }}
+          sqlServerName: ${{ parameters.test.sqlServerName }}
+          sqlDatabaseName: ${{ variables.containerImageName }}
+
+      - template: container/pipelines/templates/servicemanifest.yml@Pipelines
+        parameters:
+          webAppName: ${{ parameters.test.webAppName }}
+          environment: ${{ parameters.test.environment }}
+          servicemanifestFilename: ${{ parameters.test.servicemanifestFilename }}
+          resourceGroup: ${{ parameters.test.resourceGroup }}
+          azureSubscription: ${{ parameters.test.azureSubscription }}
+          keyVaultName: ${{ parameters.test.keyVaultName }}
+          dependsOn: DatabaseMigrationJob
+
+      - template: container/pipelines/templates/containerimage-deploy.yml@Pipelines
+        parameters:
+          webAppName: ${{ parameters.test.webAppName }}
+          environment: ${{ parameters.test.environment }}
+          resourceGroup: ${{ parameters.test.resourceGroup }}
+          azureSubscription: ${{ parameters.test.azureSubscription }}
+          deploymentEnvironment: ${{ parameters.test.deploymentEnvironment }}
+          containerImageName: ${{ variables.containerImageName }}
+          containerRegistry: ${{ variables.containerRegistry }}
+          dependsOn: UpdateAppSettings
+          
+
+########################################################
+##############     Deploy: Prod    #####################
+
+  - stage: Deploy${{ parameters.prod.environment }}
+    dependsOn: Deploy${{ parameters.test.environment }}    
+    displayName: Deploy ${{ parameters.prod.environment }}
+    jobs:
+      - template: templates/migrate-database.yml
+        parameters:
+          azureSubscription: ${{ parameters.prod.azureSubscription }}
+          sqlServerName: ${{ parameters.prod.sqlServerName }}
+          sqlDatabaseName: ${{ variables.containerImageName }}
+
+      - template: container/pipelines/templates/servicemanifest.yml@Pipelines
+        parameters:
+          webAppName: ${{ parameters.prod.webAppName }}
+          environment: ${{ parameters.prod.environment }}
+          servicemanifestFilename: ${{ parameters.prod.servicemanifestFilename }}
+          resourceGroup: ${{ parameters.prod.resourceGroup }}
+          azureSubscription: ${{ parameters.prod.azureSubscription }}
+          keyVaultName: ${{ parameters.prod.keyVaultName }}
+          dependsOn: DatabaseMigrationJob
+
+      - template: container/pipelines/templates/containerimage-deploy.yml@Pipelines
+        parameters:
+          webAppName: ${{ parameters.prod.webAppName }}
+          environment: ${{ parameters.prod.environment }}
+          resourceGroup: ${{ parameters.prod.resourceGroup }}
+          azureSubscription: ${{ parameters.prod.azureSubscription }}
+          deploymentEnvironment: ${{ parameters.prod.deploymentEnvironment }}
+          containerImageName: ${{ variables.containerImageName }}
+          containerRegistry: ${{ variables.containerRegistry }}
+          dependsOn: UpdateAppSettings
+          
